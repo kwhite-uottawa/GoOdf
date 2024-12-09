@@ -23,12 +23,6 @@
 #include "GOODFFunctions.h"
 #include <wx/unichar.h>
 
-#define TREMULANT_MESSAGE do { \
-		wxMessageDialog msg(::wxGetApp().m_frame, wxT("Warning: A mix of tremulant and non-tremulant pipes in a rank."), wxT("Pipe Tremulants Warning"), wxOK|wxCENTRE|wxICON_EXCLAMATION); \
-                msg.ShowModal(); \
-		} while(0)
-#define MIXED_TREMULANTS(a, b) (((a) && (b) == -1) || (!(a) && (b) != -1))
-
 Rank::Rank() {
 	name = wxT("New Rank");
 	firstMidiNoteNumber = 36;

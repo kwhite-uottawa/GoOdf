@@ -68,4 +68,9 @@ public:
 
 DECLARE_APP(GOODF)
 
+#define TREMULANT_MESSAGE do { \
+	wxMessageDialog msg(::wxGetApp().m_frame, wxT("Warning: An unusual use of pipe tremulant settings.  See help for common Tremulant examples."), wxT("Pipe Tremulants Warning"), wxOK|wxCENTRE|wxICON_EXCLAMATION); \
+	msg.ShowModal(); \
+	} while(0)
+
 #endif
