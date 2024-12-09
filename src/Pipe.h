@@ -60,6 +60,7 @@ public:
 	void updateRefString();
 	bool isIndependentRelease();
 	void setIndependentRelease(bool independent);
+	bool hasComplexTremulant();
 
 	bool isPercussive;
 	bool hasIndependentRelease;
