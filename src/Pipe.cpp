@@ -504,7 +504,7 @@ bool Pipe::hasUnusualTremulants() {
 	int nrelnulls = 0;
 	int nrelwavs = 0;
 	int nrelnonwavs = 0;
-	static bool doTest = true;
+	static bool doTest = false;
 
 	if (doTest) {
 /*
