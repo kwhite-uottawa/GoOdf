@@ -240,17 +240,17 @@ void Rank::read(wxFileConfig *cfg, Organ *readOrgan) {
 	if (!m_pipes.empty())
 		m_pipes.clear();
 
-	bool hadIgnoreTremulant = false;
+	bool hadUnusualTremulants = false;
 	for (int i = 0; i < numberOfLogicalPipes; i++) {
 		Pipe p;
 		wxString pipeNbr = wxT("Pipe") + GOODF_functions::number_format(i + 1);
 		p.read(cfg, pipeNbr, this, readOrgan);
 		m_pipes.push_back(p);
-		if (p.hasComplexTremulant()) {
-			hadIgnoreTremulant = true;
+		if (p.hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
 		}
 	}
-	if (hadIgnoreTremulant) {
+	if (hadUnusualTremulants) {
 		TREMULANT_MESSAGE;
 	}
 }
@@ -419,7 +419,7 @@ void Rank::readPipes(
 	int totalNbrOfPipes
 ) {
 	bool organRootPathIsSet = false;
-	bool hadIgnoreTremulant = false;
+	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -723,12 +723,12 @@ void Rank::readPipes(
 		}
 
 		//m_pipes.push_back(p);
-		if (p->hasComplexTremulant()) {
-			hadIgnoreTremulant = true;
+		if (p->hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
 		}
 		count++;
 	}
-	if (hadIgnoreTremulant) {
+	if (hadUnusualTremulants) {
 		TREMULANT_MESSAGE;
 	}
 }
@@ -746,7 +746,7 @@ void Rank::addToPipes(
 	int totalNbrOfPipes
 ) {
 	bool organRootPathIsSet = false;
-	bool hadIgnoreTremulant = false;
+	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1041,12 +1041,12 @@ void Rank::addToPipes(
 			}
 		}
 
-		if (p->hasComplexTremulant()) {
-			hadIgnoreTremulant = true;
+		if (p->hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
 		}
 		count++;
 	}
-	if (hadIgnoreTremulant) {
+	if (hadUnusualTremulants) {
 		TREMULANT_MESSAGE;
 	}
 }
@@ -1063,7 +1063,7 @@ void Rank::addTremulantToPipes(
 ) {
 	// This method is for adding additional attacks/releases as (wave) tremulants only
 	bool organRootPathIsSet = false;
-	bool hadIgnoreTremulant = false;
+	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1225,13 +1225,13 @@ void Rank::addTremulantToPipes(
 				pipeReleasesToAdd.Empty();
 			}
 		}
-		if (p->hasComplexTremulant()) {
-			hadIgnoreTremulant = true;
+		if (p->hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
 		}
 		count++;
 	}
 	
-	if (hadIgnoreTremulant) {
+	if (hadUnusualTremulants) {
 		TREMULANT_MESSAGE;
 	}
 }
@@ -1244,7 +1244,7 @@ void Rank::addReleasesToPipes(
 ) {
 	// This method is for adding releases only from a single folder
 	bool organRootPathIsSet = false;
-	bool hadIgnoreTremulant = false;
+	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1301,12 +1301,12 @@ void Rank::addReleasesToPipes(
 
 		pipeReleases.Empty();
 		pipeReleasesToAdd.Empty();
-		if (p->hasComplexTremulant()) {
-			hadIgnoreTremulant = true;
+		if (p->hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
 		}
 		count++;
 	}
-	if (hadIgnoreTremulant) {
+	if (hadUnusualTremulants) {
 		TREMULANT_MESSAGE;
 	}
 }

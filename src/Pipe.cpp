@@ -497,7 +497,7 @@ void Pipe::setIndependentRelease(bool independent) {
 
 #define SIMPLE_TREMULANT(nulls, wavs, nonwavs) ( ((nulls) + (wavs) + (nonwavs)) == 0 || ((nulls) > 0 && (wavs) == 0 && (nonwavs) == 0 || ((nulls) == 0 && (wavs) > 0 && (nonwavs) > 0)) )
 
-bool Pipe::hasComplexTremulant() {
+bool Pipe::hasUnusualTremulants() {
 	int natnulls = 0;		// attacks with no isTremulant
 	int natwavs = 0;		// attacks with wave isTremulant=1
 	int natnonwavs = 0;		// attacks with wave isTremulant=0
@@ -508,15 +508,15 @@ bool Pipe::hasComplexTremulant() {
 
 	if (doTest) {
 /*
-hasComplexTremulant(Att (0,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (1,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (0,1,1), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (0,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (1,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (0,1,1), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (0,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (1,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasComplexTremulant(Att (0,1,1), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (1,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,1,1), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (1,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,1,1), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (1,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
+hasUnusualTremulants(Att (0,1,1), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
 */
 		doTest = false;
 		for (int i = 0; i < 64 /* 2 ^ 6 */; i++ ) {
@@ -527,7 +527,7 @@ hasComplexTremulant(Att (0,1,1), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_T
 			nrelwavs = (i & 16) >> 4;
 			nrelnonwavs = (i & 32) >> 5;
 		
-			fprintf(stderr, "hasComplexTremulant(Att (%d,%d,%d), Rel (%d,%d,%d), SIMPLE_TREMULANT(Att): %d, SIMPLE_TREMULANT(Rel): %d, result: %d \n",
+			fprintf(stderr, "hasUnusualTremulants(Att (%d,%d,%d), Rel (%d,%d,%d), SIMPLE_TREMULANT(Att): %d, SIMPLE_TREMULANT(Rel): %d, result: %d \n",
 				natnulls, natwavs, natnonwavs,
 				nrelnulls, nrelwavs, nrelnonwavs,
 				SIMPLE_TREMULANT(natnulls, natwavs, natnonwavs),
