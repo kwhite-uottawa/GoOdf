@@ -672,11 +672,21 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 			return;
 		}
 	} else {
-		odfFile->Create(fullFileName);
+		if (!odfFile->Create(fullFileName)) {
+			wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to create!"), wxT("ODF file not created!"), wxOK|wxCENTRE);
+			msg.ShowModal();
+			return;
+		}
+
 	}
 	m_organ->writeOrgan(odfFile);
 
-	odfFile->Write(wxTextFileType_Dos, wxCSConv("ISO-8859-1"));
+	if (!odfFile->Write(wxTextFileType_Dos)) {
+		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to write!"), wxT("ODF file not written!"), wxOK|wxCENTRE);
+		msg.ShowModal();
+		return;
+	}
+
 	if (!m_organHasBeenSaved) {
 		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written!"), wxT("ODF file written"), wxOK|wxCENTRE);
 		msg.ShowModal();
