@@ -22,6 +22,7 @@
 #include "GOODF.h"
 #include "GOODFFunctions.h"
 #include <wx/unichar.h>
+#include <wx/regex.h>
 
 Rank::Rank() {
 	name = wxT("New Rank");
@@ -1519,44 +1520,18 @@ void Rank::exactlyMatchMidiNumber(wxArrayString &fileList, int midiNbr) {
 	// incoming fileList contains full paths to candidate files
 	// but in this function we're interested only in the file name
 	// we get it by converting path to wxFileName and then extracting the name part
+
 	if (!fileList.IsEmpty()) {
 		for (int i = fileList.size() - 1; i >= 0; i--) {
 			wxFileName whole_path(fileList[i]);
 			wxString file_name = whole_path.GetFullName();
-			bool isAnExactMatch = true;
 			wxString nbrStr = wxString::Format(wxT("%i"), midiNbr);
-			int matching_position = file_name.Find(nbrStr);
+			wxRegEx midiRegEx = wxRegEx(wxString::Format(wxT("(^|[^0-9])0?(%i)([^0-9]|$)"), midiNbr));
 
-			if (matching_position > 0) {
-				// the number is not in the beginning, the only valid number occuring before this is a 0
-				for (int currentIndex = matching_position - 1; currentIndex >= 0; currentIndex--) {
-					wxUniChar currentChar = file_name.GetChar(currentIndex);
-					if (currentChar == '0' || wxIsalpha(currentChar)) {
-						continue;
-					} else {
-						isAnExactMatch = false;
-					}
-				}
-			} else if (matching_position != 0) {
-				// if matching position is negative (wxNOT_FOUND) then this file is not a match
-				isAnExactMatch = false;
-			}
-
-			if (isAnExactMatch && matching_position + nbrStr.Len() < file_name.Len() - 1) {
-				int posAfterMatch = matching_position + nbrStr.Len();
-				// we need to check what is after this matching number too
-				for (int currentIndex = posAfterMatch; currentIndex < (int) file_name.Len(); currentIndex++) {
-					wxUniChar currentChar = file_name.GetChar(currentIndex);
-					if (currentChar == '-' || currentChar == '_' || currentChar == '.') {
-						break;
-					}
-					if (wxIsdigit(currentChar)) {
-						isAnExactMatch = false;
-					}
-				}
-			}
-
-			if (!isAnExactMatch) {
+			if (midiRegEx.IsValid() && midiRegEx.Matches(file_name) && midiRegEx.GetMatch(file_name, 2) == nbrStr) {
+				// fprintf(stderr, "Matched '%s' in '%s' (%s)\n", (const char *)midiRegEx.GetMatch(file_name, 2).mb_str(), (const char *)file_name.mb_str(), (const char *)midiRegEx.GetMatch(file_name, 0));
+			} else {
+				// fprintf(stderr, "Removing file: %s\n", (const char *)file_name.mb_str());
 				fileList.RemoveAt(i);
 			}
 		}
