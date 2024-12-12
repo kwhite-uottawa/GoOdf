@@ -1601,7 +1601,7 @@ void RankPanel::OnEditAttack() {
 			}
 		}
 		if (hadUnusualTremulants) {
-			TREMULANT_MESSAGE;
+			TREMULANT_MESSAGE(m_rank->getName());
 		}
 		::wxGetApp().m_frame->m_organ->setModified(true);
 	}
@@ -1650,7 +1650,7 @@ void RankPanel::OnEditRelease() {
 			}
 		}
 		if (hadUnusualTremulants) {
-			TREMULANT_MESSAGE;
+			TREMULANT_MESSAGE(m_rank->getName());
 		}
 		::wxGetApp().m_frame->m_organ->setModified(true);
 	}
