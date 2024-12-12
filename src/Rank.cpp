@@ -1516,6 +1516,59 @@ void Rank::setupPipeProperties(Pipe &pipe) {
 	pipe.maxVelocityVolume = this->maxVelocityVolume;
 }
 
+bool old_matchMidiNumber(wxString file_name, int midiNbr) {
+	bool isAnExactMatch = true;
+	wxString nbrStr = wxString::Format(wxT("%i"), midiNbr);
+	int matching_position = file_name.Find(nbrStr);
+
+	if (matching_position > 0) {
+		// the number is not in the beginning, the only valid number occuring before this is a 0
+		for (int currentIndex = matching_position - 1; currentIndex >= 0; currentIndex--) {
+			wxUniChar currentChar = file_name.GetChar(currentIndex);
+			if (currentChar == '0' || wxIsalpha(currentChar)) {
+				continue;
+			} else {
+				isAnExactMatch = false;
+			}
+		}
+	} else if (matching_position != 0) {
+		// if matching position is negative (wxNOT_FOUND) then this file is not a match
+		isAnExactMatch = false;
+	}
+ 
+	if (isAnExactMatch && matching_position + nbrStr.Len() < file_name.Len() - 1) {
+		int posAfterMatch = matching_position + nbrStr.Len();
+		// we need to check what is after this matching number too
+		for (int currentIndex = posAfterMatch; currentIndex < (int) file_name.Len(); currentIndex++) {
+			wxUniChar currentChar = file_name.GetChar(currentIndex);
+			if (currentChar == '-' || currentChar == '_' || currentChar == '.') {
+				break;
+			}
+			if (wxIsdigit(currentChar)) {
+				isAnExactMatch = false;
+			}
+		}
+	}
+	return isAnExactMatch;
+}
+
+bool matchMidiNumber(wxString file_name, int midiNbr) {
+	bool isAnExactMatch = false;
+	wxRegEx midiRegEx = wxRegEx(wxString::Format(wxT("^([0[:alpha:]]*)(%i)([^[:digit:]]*[-._])"), midiNbr));
+
+	if (midiRegEx.IsValid() && midiRegEx.Matches(file_name)) {
+		isAnExactMatch = true;
+	} else {
+		isAnExactMatch = false;
+	}
+/*
+	if (isAnExactMatch != old_matchMidiNumber(file_name, midiNbr)) {
+		fprintf(stderr, "Mismatch between result of regex (%d) and old matching code on '%s'.\n", isAnExactMatch, (const char *)file_name.mb_str());
+	}
+*/
+	return isAnExactMatch;
+}
+
 void Rank::exactlyMatchMidiNumber(wxArrayString &fileList, int midiNbr) {
 	// incoming fileList contains full paths to candidate files
 	// but in this function we're interested only in the file name
@@ -1524,14 +1577,7 @@ void Rank::exactlyMatchMidiNumber(wxArrayString &fileList, int midiNbr) {
 	if (!fileList.IsEmpty()) {
 		for (int i = fileList.size() - 1; i >= 0; i--) {
 			wxFileName whole_path(fileList[i]);
-			wxString file_name = whole_path.GetFullName();
-			wxString nbrStr = wxString::Format(wxT("%i"), midiNbr);
-			wxRegEx midiRegEx = wxRegEx(wxString::Format(wxT("(^|[^0-9])0?(%i)([^0-9]|$)"), midiNbr));
-
-			if (midiRegEx.IsValid() && midiRegEx.Matches(file_name) && midiRegEx.GetMatch(file_name, 2) == nbrStr) {
-				// fprintf(stderr, "Matched '%s' in '%s' (%s)\n", (const char *)midiRegEx.GetMatch(file_name, 2).mb_str(), (const char *)file_name.mb_str(), (const char *)midiRegEx.GetMatch(file_name, 0));
-			} else {
-				// fprintf(stderr, "Removing file: %s\n", (const char *)file_name.mb_str());
+			if (!matchMidiNumber(whole_path.GetFullName(), midiNbr)) {
 				fileList.RemoveAt(i);
 			}
 		}
@@ -1542,4 +1588,5 @@ void Rank::updatePipeRelativePaths() {
 	for (Pipe& p : m_pipes) {
 		p.updateRelativePaths();
 	}
+
 }
