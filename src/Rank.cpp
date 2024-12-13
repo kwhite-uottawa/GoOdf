@@ -246,7 +246,7 @@ void Rank::read(wxFileConfig *cfg, Organ *readOrgan) {
 		}
 	}
 	if (hadUnusualTremulants) {
-		TREMULANT_MESSAGE(getName());
+		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -724,7 +724,7 @@ void Rank::readPipes(
 		count++;
 	}
 	if (hadUnusualTremulants) {
-		TREMULANT_MESSAGE(getName());
+		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1042,7 +1042,7 @@ void Rank::addToPipes(
 		count++;
 	}
 	if (hadUnusualTremulants) {
-		TREMULANT_MESSAGE(getName());
+		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1227,7 +1227,7 @@ void Rank::addTremulantToPipes(
 	}
 	
 	if (hadUnusualTremulants) {
-		TREMULANT_MESSAGE(getName());
+		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1302,7 +1302,7 @@ void Rank::addReleasesToPipes(
 		count++;
 	}
 	if (hadUnusualTremulants) {
-		TREMULANT_MESSAGE(getName());
+		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
