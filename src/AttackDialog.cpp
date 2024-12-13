@@ -388,7 +388,7 @@ void AttackDialog::CreateControls() {
 		ID_ATK_DIALOG_DELETE_LOOP_BTN,
 		wxT("Delete selected loop")
 	);
-	loopBtnContainer->Add(m_deleteLoopBtn, 0, wxGROW|wxALL, 5)
+	loopBtnContainer->Add(m_deleteLoopBtn, 0, wxGROW|wxALL, 5);
 	loopBtnContainer->AddStretchSpacer();
 	sixthRow->Add(loopBtnContainer, 0, wxGROW);
 	wxStaticBoxSizer *loopPropertiesContainer = new wxStaticBoxSizer(wxVERTICAL, this, wxT("Selected loop properties"));
