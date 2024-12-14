@@ -495,7 +495,11 @@ void Pipe::setIndependentRelease(bool independent) {
 	}
 }
 
-#define SIMPLE_TREMULANT(nulls, wavs, nonwavs) ( ((nulls) + (wavs) + (nonwavs)) == 0 || ((nulls) > 0 && (wavs) == 0 && (nonwavs) == 0 || ((nulls) == 0 && (wavs) > 0 && (nonwavs) > 0)) )
+#define SIMPLE_TREMULANT(nulls, wavs, nonwavs) ( \
+	(((nulls) + (wavs) + (nonwavs)) == 0) || \
+	((nulls) > 0 && (wavs) == 0 && (nonwavs) == 0) || \
+	((nulls) == 0 && (wavs) > 0 && (nonwavs) > 0) \
+	)
 
 bool Pipe::hasUnusualTremulants() {
 	int natnulls = 0;		// attacks with no isTremulant
@@ -504,39 +508,6 @@ bool Pipe::hasUnusualTremulants() {
 	int nrelnulls = 0;
 	int nrelwavs = 0;
 	int nrelnonwavs = 0;
-	static bool doTest = false;
-
-	if (doTest) {
-/*
-hasUnusualTremulants(Att (0,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (1,0,0), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (0,1,1), Rel (0,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (0,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (1,0,0), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (0,1,1), Rel (1,0,0), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (0,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (1,0,0), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-hasUnusualTremulants(Att (0,1,1), Rel (0,1,1), SIMPLE_TREMULANT(Att): 1, SIMPLE_TREMULANT(Rel): 1, result: 1 
-*/
-		doTest = false;
-		for (int i = 0; i < 64 /* 2 ^ 6 */; i++ ) {
-			natnulls = i & 1;
-			natwavs = (i & 2) >> 1;
-			natnonwavs = (i & 4) >> 2;
-			nrelnulls = (i & 8) >> 3;
-			nrelwavs = (i & 16) >> 4;
-			nrelnonwavs = (i & 32) >> 5;
-		
-			fprintf(stderr, "hasUnusualTremulants(Att (%d,%d,%d), Rel (%d,%d,%d), SIMPLE_TREMULANT(Att): %d, SIMPLE_TREMULANT(Rel): %d, result: %d \n",
-				natnulls, natwavs, natnonwavs,
-				nrelnulls, nrelwavs, nrelnonwavs,
-				SIMPLE_TREMULANT(natnulls, natwavs, natnonwavs),
-				SIMPLE_TREMULANT(nrelnulls, nrelwavs, nrelnonwavs),
-				SIMPLE_TREMULANT(natnulls, natwavs, natnonwavs) && SIMPLE_TREMULANT(nrelnulls, nrelwavs, nrelnonwavs)
-			);
-		}
-		natnulls = natwavs = natnonwavs = nrelnulls = nrelwavs = nrelnonwavs = 0;
-	}
 
 	for (Attack atk : this->m_attacks) {
 		if (atk.isTremulant == -1) {
