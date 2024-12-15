@@ -689,6 +689,13 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 	}
 	m_organ->writeOrgan(odfFile);
 
+// XXX
+// GO as of 3.15.3 ignores LANG and needs the BOM in order to properly detect UTF8. Otherwise GO assumes ISO-8859-1 or ASCII.
+// There does not appear to be an easy way to add the BOM on unix...
+// https://en.wikipedia.org/wiki/Byte_order_mark
+// https://forums.wxwidgets.org/viewtopic.php?t=39511
+//   for now, something like this after the fact: sed -i -e '1s/^/\xef\xbb\xbf/' FILE.organ
+
 	if (!odfFile->Write(wxTextFileType_Dos)) {
 		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to write!"), wxT("ODF file not written!"), wxOK|wxCENTRE);
 		msg.ShowModal();
