@@ -862,6 +862,7 @@ void Rank::addToPipes(
 
 				// if there are any matching releases we add them
 				if (!pipeReleasesToAdd.IsEmpty()) {
+
 					for (unsigned k = 0; k < pipeReleasesToAdd.GetCount(); k++) {
 						wxString relativeFileName;
 						if (organRootPathIsSet)
@@ -991,7 +992,6 @@ void Rank::addToPipes(
 
 					// if there are any matching releases we add them
 					if (!pipeReleasesToAdd.IsEmpty()) {
-
 						for (unsigned k = 0; k < pipeReleasesToAdd.GetCount(); k++) {
 							wxString relativeFileName;
 							if (organRootPathIsSet)
@@ -1225,7 +1225,7 @@ void Rank::addTremulantToPipes(
 		}
 		count++;
 	}
-	
+
 	if (hadUnusualTremulants) {
 		GOODF_functions::logTremulantMessage(getName());
 	}
@@ -1274,7 +1274,6 @@ void Rank::addReleasesToPipes(
 
 		// if there are any matching attacks we add them
 		if (!pipeReleasesToAdd.IsEmpty()) {
-
 			for (unsigned j = 0; j < pipeReleasesToAdd.GetCount(); j++) {
 				wxString relativeFileName;
 				if (organRootPathIsSet)
