@@ -495,7 +495,11 @@ void Pipe::setIndependentRelease(bool independent) {
 	}
 }
 
-#define SIMPLE_TREMULANT(nulls, wavs, nonwavs) ( \
+// An attack or release is expected to have either no samples,
+//   only samples with no tremulant specfified (without Pipe999IsTremulant=),
+//   or only samples with tremulant specified (with both Pipe999IsTremulant=0 and Pipe999IsTremulant=1)
+
+#define EXPECTED_TREMULANT(nulls, wavs, nonwavs) ( \
 	(((nulls) + (wavs) + (nonwavs)) == 0) || \
 	((nulls) > 0 && (wavs) == 0 && (nonwavs) == 0) || \
 	((nulls) == 0 && (wavs) > 0 && (nonwavs) > 0) \
@@ -529,7 +533,7 @@ bool Pipe::hasUnusualTremulants() {
 		}
 	}
 
-	if (SIMPLE_TREMULANT(natnulls, natwavs, natnonwavs) && SIMPLE_TREMULANT(nrelnulls, nrelwavs, nrelnonwavs)) {
+	if (EXPECTED_TREMULANT(natnulls, natwavs, natnonwavs) && EXPECTED_TREMULANT(nrelnulls, nrelwavs, nrelnonwavs)) {
 		return false;
 	} else {
 		return true;

@@ -1537,5 +1537,4 @@ void Rank::updatePipeRelativePaths() {
 	for (Pipe& p : m_pipes) {
 		p.updateRelativePaths();
 	}
-
 }
