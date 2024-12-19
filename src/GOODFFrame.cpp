@@ -680,7 +680,7 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 	wxString fullFileName = m_organPanel->getOdfPath() + wxFILE_SEP_PATH + m_organPanel->getOdfName() + wxT(".organ");
-	if (!fullFileName.IsSameAs(m_recentlyUsed->GetHistoryFile(0))) {
+	if (m_recentlyUsed->GetCount() &&  !fullFileName.IsSameAs(m_recentlyUsed->GetHistoryFile(0))) {
 		m_organHasBeenSaved = false;
 	}
 	wxTextFile *odfFile = new wxTextFile(fullFileName);
