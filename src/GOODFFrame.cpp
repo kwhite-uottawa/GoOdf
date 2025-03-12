@@ -26,7 +26,6 @@
 #include <wx/stdpaths.h>
 #include <wx/msgdlg.h>
 #include <wx/button.h>
-#include <wx/font.h>
 #include "Enclosure.h"
 #include "Windchestgroup.h"
 #include "OrganFileParser.h"
