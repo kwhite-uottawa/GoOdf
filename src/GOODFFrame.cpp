@@ -655,21 +655,37 @@ void GOODFFrame::OnClose(wxCloseEvent& event) {
 	Destroy();
 }
 
-// iterate through odfFile checking that conv would work
-bool checkConversion(wxTextFile *odfFile, wxCSConv conv) {
+// output as UTF8 and include the BOM marker
+bool writeUTF8(wxTextFile *odfFile, wxFile *outFile) {
 	bool isOk = true;
-	size_t unused=0;
+	char buf[2048];
+	char eol[16];
+	wxCSConv conv = wxCSConv("UTF-8");
+
+	eol[conv.FromWChar(eol, sizeof(eol), wxTextFile::GetEOL(wxTextFileType_Dos))] = '\0';
 	wxString str;
+
+	outFile->Write("\xef\xbb\xbf", 3);
+
 	if (!conv.IsOk()) {
 		return false;
 	}
 	for ( str = odfFile->GetFirstLine(); !odfFile->Eof(); str = odfFile->GetNextLine() ) {
-		size_t result = conv.FromWChar(NULL, unused, str);
-		if (result == wxCONV_FAILED) {
+		size_t result = conv.FromWChar(buf, sizeof(buf) - sizeof(eol), str);
+		if (result == wxCONV_FAILED || result == 0) {
+			isOk = false;
+			break;
+		}
+		for (int i = 0; eol[i] && i < (int) sizeof(eol); i++, result++) {
+			buf[result-1] = eol[i];
+		}
+		result--;
+		if (outFile->Write(buf, result) != result) {
 			isOk = false;
 			break;
 		}
 	}
+	outFile->Flush();
 	return isOk;
 }
 
@@ -709,41 +725,25 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 	}
 	m_organ->writeOrgan(odfFile);
 
-	wxCSConv useConv = wxCSConv(wxFONTENCODING_ISO8859_1);
-	if (!checkConversion(odfFile, useConv)) {
-		wxMessageDialog dlg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to write encoded as ISO-8859-1.  Do you want to try the system encoding?"), wxT("Try system encoding?"), wxYES_NO|wxCENTRE);
-		if (dlg.ShowModal() != wxID_YES) {
-			return;
-		} else {
-			useConv = wxCSConv(wxFONTENCODING_SYSTEM);
-			if (!checkConversion(odfFile, useConv)) {
-				wxMessageDialog dlg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to write in system encoding.  Do you want to try UTF8?"), wxT("Try UTF8?"), wxYES_NO|wxCENTRE);
-				if (dlg.ShowModal() != wxID_YES) {
-					return;
-				}
-				useConv = wxCSConv(wxFONTENCODING_UTF8);
-			}
+	odfFile->Write(wxTextFileType_Dos, wxCSConv("ISO-8859-1"));
+
+	wxFile *written = new wxFile(odfFile->GetName(), wxFile::write_append);
+	wxString utf8 = wxT("");
+	if (written->IsOpened() && written->Length() == 0) {  // if the written .organ file is empty, try encoding as UTF8
+		if (writeUTF8(odfFile, written)) {
+			utf8 = wxT(" as UTF-8");
 		}
-	}
-// XXX
-// GrandOrgue up to at least 3.15.3 ignores LANG and needs the BOM in order to properly detect UTF8.
-// Without BOM GrandOrgue assumes ISO-8859-1.
-// There does not appear to be an easy way to add the BOM on unix...
-// https://en.wikipedia.org/wiki/Byte_order_mark
-// https://forums.wxwidgets.org/viewtopic.php?t=39511
-//   for now, something like this after the fact: sed -i -e '1s/^/\xef\xbb\xbf/' FILE.organ
-	if (!odfFile->Write(wxTextFileType_Dos, useConv)) {
-		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ failed to write!"), wxT("ODF file not written!"), wxOK|wxCENTRE);
-		msg.ShowModal();
-		return;
 	}
 
 	if (!m_organHasBeenSaved) {
-		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written!"), wxT("ODF file written"), wxOK|wxCENTRE);
+		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written!") + utf8, wxT("ODF file written"), wxOK|wxCENTRE);
 		msg.ShowModal();
 	}
+
 	odfFile->Close();
+	delete written;
 	delete odfFile;
+
 	m_organHasBeenSaved = true;
 	m_organ->setModified(false);
 	UpdateFrameTitle();
