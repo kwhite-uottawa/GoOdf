@@ -654,13 +654,34 @@ void GOODFFrame::OnClose(wxCloseEvent& event) {
 	Destroy();
 }
 
-// output as UTF8 and include the BOM marker
-bool writeUTF8(wxTextFile *odfFile, wxFile *outFile) {
+// iterate through wxTextFile checking that wxCSConv would work
+bool checkConversion(wxTextFile *odfFile, wxCSConv conv) {
+	bool isOk = true;
+	size_t unused=0;
+	int i;
+
+	wxString str;
+	if (!conv.IsOk()) {
+		return false;
+	}
+	for (i = 0, str = odfFile->GetFirstLine(); !odfFile->Eof(); str = odfFile->GetNextLine(), i++ ) {
+		size_t result = conv.FromWChar(NULL, unused, str);
+		if (result == wxCONV_FAILED) {
+			isOk = false;
+			break;
+		}
+	}
+	return isOk;
+}
+
+// output wxTextFile as UTF8 and include the BOM marker
+bool writeUTF8(wxTextFile *odfFile) {
 	bool isOk = true;
 	char buf[2048];
 	char eol[16];
 	wxCSConv conv = wxCSConv("UTF-8");
 
+	wxFile *outFile = new wxFile(odfFile->GetName(), wxFile::write);
 	eol[conv.FromWChar(eol, sizeof(eol), wxTextFile::GetEOL(wxTextFileType_Dos))] = '\0';
 	wxString str;
 
@@ -685,6 +706,7 @@ bool writeUTF8(wxTextFile *odfFile, wxFile *outFile) {
 		}
 	}
 	outFile->Flush();
+	delete outFile;
 	return isOk;
 }
 
@@ -722,25 +744,22 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 		}
 
 	}
+
+	wxString tail = wxT("!");
 	m_organ->writeOrgan(odfFile);
-
-	odfFile->Write(wxTextFileType_Dos, wxCSConv("ISO-8859-1"));
-
-	wxFile *written = new wxFile(odfFile->GetName(), wxFile::write_append);
-	wxString utf8 = wxT("");
-	if (written->IsOpened() && written->Length() == 0) {  // if the written .organ file is empty, try encoding as UTF8
-		if (writeUTF8(odfFile, written)) {
-			utf8 = wxT(" as UTF-8");
-		}
+	if (checkConversion(odfFile, wxCSConv("ISO-8859-1"))) {
+		odfFile->Write(wxTextFileType_Dos, wxCSConv("ISO-8859-1"));
+	} else {
+		writeUTF8(odfFile);
+		tail = wxT(" as UTF-8") + tail;
 	}
 
 	if (!m_organHasBeenSaved) {
-		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written!") + utf8, wxT("ODF file written"), wxOK|wxCENTRE);
+		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written") + tail, wxT("ODF file written"), wxOK|wxCENTRE);
 		msg.ShowModal();
 	}
 
 	odfFile->Close();
-	delete written;
 	delete odfFile;
 
 	m_organHasBeenSaved = true;
