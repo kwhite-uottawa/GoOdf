@@ -758,10 +758,8 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 		wxMessageDialog msg(this, wxT("ODF file ") + m_organPanel->getOdfName() + wxT(".organ has been written") + tail, wxT("ODF file written"), wxOK|wxCENTRE);
 		msg.ShowModal();
 	}
-
 	odfFile->Close();
 	delete odfFile;
-
 	m_organHasBeenSaved = true;
 	m_organ->setModified(false);
 	UpdateFrameTitle();
