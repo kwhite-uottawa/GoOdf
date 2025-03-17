@@ -764,6 +764,8 @@ void GOODFFrame::OnWriteODF(wxCommandEvent& WXUNUSED(event)) {
 	m_organ->setModified(false);
 	UpdateFrameTitle();
 	m_recentlyUsed->AddFileToHistory(fullFileName);
+	if (m_logWindow->GetFrame()->IsShown())
+		m_logWindow->GetFrame()->Raise();
 }
 
 void GOODFFrame::OnReadOrganFile(wxCommandEvent& WXUNUSED(event)) {
