@@ -81,7 +81,7 @@ namespace GOODF_functions {
 	}
 
 	inline wxString checkIfFileExist(wxString relativePath, Organ *currentOrgan) {
-		static char *nodelete = getenv("_GOODF_NODELETE_");
+		bool keepFiles = ::wxGetApp().m_frame->m_keepMissingFiles;
 		if (relativePath != wxEmptyString) {
 			if (relativePath.StartsWith(wxT("./")) || relativePath.StartsWith(wxT(".\\")))
 				relativePath.erase(0, 2);
@@ -91,10 +91,10 @@ namespace GOODF_functions {
 				return theFile.GetFullPath();
 			}
 			if (!(relativePath.IsSameAs("DUMMY") || relativePath.StartsWith("REF:"))) {  // warn about removed files
-				wxLogWarning("%s does not exist.%s", relativePath, (nodelete == NULL) ? " Removed from .organ file" : "");
+				wxLogWarning("%s does not exist.%s", relativePath, (keepFiles) ? "" : " Removed from .organ file");
 				::wxGetApp().m_frame->GetLogWindow()->Show(true);
 			}
-			if (nodelete != NULL) {
+			if (keepFiles) {
 				return relativePath;
 			}
 		}
