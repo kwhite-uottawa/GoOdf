@@ -119,11 +119,18 @@ void Rank::write(wxTextFile *outFile) {
 
 	// pipes of the rank
 	unsigned pipeCounter = 0;
+	bool hadUnusualTremulants = false;
 	for (Pipe &p : m_pipes) {
 		pipeCounter++;
 		wxString formattedPipe = wxT("Pipe") + GOODF_functions::number_format(pipeCounter);
 
 		p.write(outFile, formattedPipe, this);
+		if (p.hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
+		}
+	}
+	if (hadUnusualTremulants) {
+		logTremulantMessage();
 	}
 }
 
@@ -167,11 +174,18 @@ void Rank::writeFromStop(wxTextFile *outFile) {
 
 	// pipes of the rank
 	unsigned pipeCounter = 0;
+	bool hadUnusualTremulants = false;
 	for (Pipe &p : m_pipes) {
 		pipeCounter++;
 		wxString formattedPipe = wxT("Pipe") + GOODF_functions::number_format(pipeCounter);
 
 		p.write(outFile, formattedPipe, this);
+		if (p.hasUnusualTremulants()) {
+			hadUnusualTremulants = true;
+		}
+	}
+	if (hadUnusualTremulants) {
+		logTremulantMessage();
 	}
 }
 
@@ -246,7 +260,7 @@ void Rank::read(wxFileConfig *cfg, Organ *readOrgan) {
 		}
 	}
 	if (hadUnusualTremulants) {
-		GOODF_functions::logTremulantMessage(getName());
+		logTremulantMessage();
 	}
 }
 
@@ -724,7 +738,7 @@ void Rank::readPipes(
 		count++;
 	}
 	if (hadUnusualTremulants) {
-		GOODF_functions::logTremulantMessage(getName());
+		logTremulantMessage();
 	}
 }
 
@@ -741,7 +755,6 @@ void Rank::addToPipes(
 	int totalNbrOfPipes
 ) {
 	bool organRootPathIsSet = false;
-	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1035,14 +1048,7 @@ void Rank::addToPipes(
 				}
 			}
 		}
-
-		if (p->hasUnusualTremulants()) {
-			hadUnusualTremulants = true;
-		}
 		count++;
-	}
-	if (hadUnusualTremulants) {
-		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1058,7 +1064,6 @@ void Rank::addTremulantToPipes(
 ) {
 	// This method is for adding additional attacks/releases as (wave) tremulants only
 	bool organRootPathIsSet = false;
-	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1220,14 +1225,7 @@ void Rank::addTremulantToPipes(
 				pipeReleasesToAdd.Empty();
 			}
 		}
-		if (p->hasUnusualTremulants()) {
-			hadUnusualTremulants = true;
-		}
 		count++;
-	}
-
-	if (hadUnusualTremulants) {
-		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1239,7 +1237,6 @@ void Rank::addReleasesToPipes(
 ) {
 	// This method is for adding releases only from a single folder
 	bool organRootPathIsSet = false;
-	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -1295,13 +1292,7 @@ void Rank::addReleasesToPipes(
 
 		pipeReleases.Empty();
 		pipeReleasesToAdd.Empty();
-		if (p->hasUnusualTremulants()) {
-			hadUnusualTremulants = true;
-		}
 		count++;
-	}
-	if (hadUnusualTremulants) {
-		GOODF_functions::logTremulantMessage(getName());
 	}
 }
 
@@ -1536,4 +1527,9 @@ void Rank::updatePipeRelativePaths() {
 	for (Pipe& p : m_pipes) {
 		p.updateRelativePaths();
 	}
+}
+
+void Rank::logTremulantMessage() {
+	wxLogError("An unusual use of pipe tremulant settings in %s.  See help for common Tremulant examples", getName());
+	::wxGetApp().m_frame->GetLogWindow()->Show(true);
 }
