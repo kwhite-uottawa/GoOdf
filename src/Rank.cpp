@@ -428,7 +428,6 @@ void Rank::readPipes(
 	int totalNbrOfPipes
 ) {
 	bool organRootPathIsSet = false;
-	bool hadUnusualTremulants = false;
 
 	if (::wxGetApp().m_frame->m_organ->getOdfRoot() != wxEmptyString)
 		organRootPathIsSet = true;
@@ -732,13 +731,7 @@ void Rank::readPipes(
 		}
 
 		//m_pipes.push_back(p);
-		if (p->hasUnusualTremulants()) {
-			hadUnusualTremulants = true;
-		}
 		count++;
-	}
-	if (hadUnusualTremulants) {
-		logTremulantMessage();
 	}
 }
 
